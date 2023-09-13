@@ -24,6 +24,7 @@ do
     {
         Console.WriteLine("Please write the channel you wish to subscribe to");
         subscribe(client, subscriberName, Console.ReadLine());
+        Console.WriteLine("Subscription completed");
     }
     if(command == "2" || command == "Publish")
     {
@@ -33,6 +34,7 @@ do
         Console.WriteLine("Please write the message you wish to publish");
 
         publish(client, channel, Console.ReadLine());
+        Console.WriteLine("Publish completed");
     }
     else
     {
@@ -61,11 +63,11 @@ static void publish(HttpClient client, string channelName, string messageText)
     var responseContent = response.Content.ReadAsStringAsync().Result;
 }
 
-static void getMessages(HttpClient client, string subscriberName, List<string> receivedMessages)
+static async void getMessages(HttpClient client, string subscriberName, List<string> receivedMessages)
 {
     while (!Console.KeyAvailable)
     {
-        var messages = client.GetFromJsonAsync<List<string>>($"{basicPublisherUrl}/api/subscribers/{subscriberName}/messages").Result;
+        var messages = await client.GetFromJsonAsync<List<string>>($"{basicPublisherUrl}/api/subscribers/{subscriberName}/messages");
 
         var newMessages = messages.Where(m => !receivedMessages.Contains(m));
 
