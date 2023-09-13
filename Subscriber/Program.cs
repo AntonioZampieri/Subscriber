@@ -5,6 +5,7 @@ using Subscriber.Models;
 
 HttpClient client = new HttpClient();
 const string basicPublisherUrl = "https://localhost:7262";
+List<string> receivedMessages = new List<string>();
 
 Console.WriteLine("Press escape to stop");
 Console.WriteLine("Please insert subscriber name");
@@ -35,7 +36,7 @@ do
     }
     else
     {
-        getMessages(client, subscriberName);
+        getMessages(client, subscriberName, receivedMessages);
     }
     command = Console.ReadLine();
 
@@ -60,12 +61,23 @@ static void publish(HttpClient client, string channelName, string messageText)
     var responseContent = response.Content.ReadAsStringAsync().Result;
 }
 
-static void getMessages(HttpClient client, string subscriberName)
+static void getMessages(HttpClient client, string subscriberName, List<string> receivedMessages)
 {
-    throw new NotImplementedException();
     while (!Console.KeyAvailable)
     {
+        var messages = client.GetFromJsonAsync<List<string>>($"{basicPublisherUrl}/api/subscribers/{subscriberName}/messages").Result;
+
+        var newMessages = messages.Where(m => !receivedMessages.Contains(m));
+
+        if (newMessages.Any()) 
+        {
+            newMessages.ToList().ForEach(message =>
+            {
+                Console.WriteLine(message);
+                receivedMessages.Add(message);
+            });
+        }
+
         Thread.Sleep(2000);
-        getMessages(client, subscriberName);
     }
 }
