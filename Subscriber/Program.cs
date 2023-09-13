@@ -11,13 +11,19 @@ Console.WriteLine("Press escape to stop");
 Console.WriteLine("Please insert subscriber name");
 
 string subscriberName = Console.ReadLine();
+Console.WriteLine("");
 
 
 Console.WriteLine("Please select one of the following operations or remain waiting for messages");
 Console.WriteLine("1 - Subscribe");
 Console.WriteLine("2 - Publish");
+Console.WriteLine("");
+
 string command = "";
 
+/// <summary>
+/// do-while cycle to use the functions to contact the server
+/// </summary>
 do
 {
     if(command == "1" || command == "Subscribe")
@@ -25,6 +31,7 @@ do
         Console.WriteLine("Please write the channel you wish to subscribe to");
         subscribe(client, subscriberName, Console.ReadLine());
         Console.WriteLine("Subscription completed");
+        Console.WriteLine("");
     }
     if(command == "2" || command == "Publish")
     {
@@ -35,6 +42,7 @@ do
 
         publish(client, channel, Console.ReadLine());
         Console.WriteLine("Publish completed");
+        Console.WriteLine("");
     }
     else
     {
@@ -45,6 +53,12 @@ do
 } while (Console.ReadKey(true).Key != ConsoleKey.Escape);
 
 
+/// <summary>
+/// function to subscribe to a channel
+/// </summary>
+/// <param name="client"> http client used to call the server </param>
+/// <param name="subscriberName"> name of the subscriber to add </param>
+/// <param name="channelName"> name of the channel to subscribe to </param>
 static void subscribe(HttpClient client, string subscriberName, string channelName)
 {
     SubscriberModel subscriber = new SubscriberModel { SubscriberName = subscriberName };
@@ -54,6 +68,12 @@ static void subscribe(HttpClient client, string subscriberName, string channelNa
     var responseContent = response.Content.ReadAsStringAsync().Result;
 }
 
+/// <summary>
+/// function to publish a message on a channel
+/// </summary>
+/// <param name="client"> http client used to call the server </param>
+/// <param name="channelName"> name of the channel to publish the message on </param>
+/// <param name="messageText"> message to publish on the channel </param>
 static void publish(HttpClient client, string channelName, string messageText)
 {
     Message message = new Message { MessageText = messageText };
@@ -63,6 +83,12 @@ static void publish(HttpClient client, string channelName, string messageText)
     var responseContent = response.Content.ReadAsStringAsync().Result;
 }
 
+/// <summary>
+/// function to get the messages for a selected subscriber and write them to console
+/// </summary>
+/// <param name="client"> http client used to call the server </param>
+/// <param name="subscriberName"> name of the subscriber to get the messages for </param>
+/// <param name="receivedMessages"> list of already received messages </param>
 static async void getMessages(HttpClient client, string subscriberName, List<string> receivedMessages)
 {
     while (!Console.KeyAvailable)
