@@ -51,9 +51,13 @@ static void subscribe(HttpClient client, string subscriberName, string channelNa
     var responseContent = response.Content.ReadAsStringAsync().Result;
 }
 
-static void publish(HttpClient client, string channel, string messageText)
+static void publish(HttpClient client, string channelName, string messageText)
 {
-    throw new NotImplementedException();
+    Message message = new Message { MessageText = messageText };
+
+    var response = client.PostAsJsonAsync($"{basicPublisherUrl}/api/channels/{channelName}/publish", message).Result;
+
+    var responseContent = response.Content.ReadAsStringAsync().Result;
 }
 
 static void getMessages(HttpClient client, string subscriberName)
