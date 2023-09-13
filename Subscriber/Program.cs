@@ -1,22 +1,28 @@
 ﻿
 
+using System.Net.Http.Json;
+using Subscriber.Models;
+
+HttpClient client = new HttpClient();
+const string basicPublisherUrl = "https://localhost:7262";
+
 Console.WriteLine("Press escape to stop");
 Console.WriteLine("Please insert subscriber name");
 
 string subscriberName = Console.ReadLine();
 
-HttpClient client = new HttpClient();
 
-
-Console.WriteLine("Please selec one of the following operations or remain waiting for messages");
+Console.WriteLine("Please select one of the following operations or remain waiting for messages");
 Console.WriteLine("1 - Subscribe");
 Console.WriteLine("2 - Publish");
 string command = "";
+
 do
 {
     if(command == "1" || command == "Subscribe")
     {
-        subscribe(subscriberName);
+        Console.WriteLine("Please write the channel you wish to subscribe to");
+        subscribe(client, subscriberName, Console.ReadLine());
     }
     if(command == "2" || command == "Publish")
     {
@@ -25,28 +31,37 @@ do
         
         Console.WriteLine("Please write the message you wish to publish");
 
-        publish(channel, Console.ReadLine());
+        publish(client, channel, Console.ReadLine());
     }
     else
     {
-        getMessages(subscriberName);
+        getMessages(client, subscriberName);
     }
     command = Console.ReadLine();
 
 } while (Console.ReadKey(true).Key != ConsoleKey.Escape);
 
 
-static void subscribe(string subscriberName)
+static void subscribe(HttpClient client, string subscriberName, string channelName)
+{
+    SubscriberModel subscriber = new SubscriberModel { SubscriberName = subscriberName };
+
+    var response = client.PostAsJsonAsync($"{basicPublisherUrl}/api/channels/{channelName}/subscribe", subscriber).Result;
+
+    var responseContent = response.Content.ReadAsStringAsync().Result;
+}
+
+static void publish(HttpClient client, string channel, string messageText)
 {
     throw new NotImplementedException();
 }
 
-static void publish(string channel, string messageText)
+static void getMessages(HttpClient client, string subscriberName)
 {
     throw new NotImplementedException();
-}
-
-static void getMessages(string subscriberName)
-{
-    throw new NotImplementedException();
+    while (!Console.KeyAvailable)
+    {
+        Thread.Sleep(2000);
+        getMessages(client, subscriberName);
+    }
 }
